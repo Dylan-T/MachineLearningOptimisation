@@ -16,7 +16,7 @@ from prettytable import PrettyTable
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Load Data
-data = pd.read_csv("data/Part 1 - regression/diamonds.csv")
+data = pd.read_csv("diamonds.csv")
 
 # Pre processing
 
@@ -40,12 +40,12 @@ train, test = ms.train_test_split(data, test_size=0.3, random_state=309)
 
 # Create & Train Models
 LinearRegression = lm.LinearRegression()
-KNeighborsRegression = kn.KNeighborsRegressor()
+KNeighborsRegression = kn.KNeighborsRegressor(n_neighbors=5)
 RidgeRegression = lm.Ridge()
 DecisionTree = dt.DecisionTreeRegressor()
 RandomForest = en.RandomForestRegressor()
 GradientBoosting = en.GradientBoostingRegressor()
-SGD = lm.SGDRegressor()
+SGD = lm.SGDRegressor(early_stopping=True)
 SVR = svm.SVR()
 LinearSVR = svm.LinearSVR()
 MLP = nn.MLPRegressor()

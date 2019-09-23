@@ -2,7 +2,6 @@ import pandas as pd
 import time
 import numpy as np
 import sklearn.preprocessing as pp
-import sklearn.model_selection as ms
 import sklearn.linear_model as lm
 import sklearn.neighbors as kn
 import sklearn.ensemble as en
@@ -18,8 +17,8 @@ from prettytable import PrettyTable
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Load Data
-train = pd.read_csv("data/Part 2 - classification/adult.data", header=None)
-test = pd.read_csv("data/Part 2 - classification/adult.test", header=None)
+train = pd.read_csv("adult.data", header=None)
+test = pd.read_csv("adult.test", header=None)
 
 # Pre processing
 # 15 features

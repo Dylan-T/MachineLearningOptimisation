@@ -57,10 +57,13 @@ def mini_batch_gradient_descent(y, x, theta, max_iters, alpha, metric_type, mini
     """
     losses = []
     thetas = []
+
     for i in range(max_iters):
-        mini_batches = create_mini_batches(x, y, mini_batch_size)
-        for mini_batch in mini_batches:
-            x_mini, y_mini = mini_batch
+        x, y = shuffle(x, y) # shuffle data so that its random
+        for j in range(0, len(x), mini_batch_size):
+            # get mini batches
+            x_mini = x[j:j + mini_batch_size]
+            y_mini = y[j:j + mini_batch_size]
             gradient = -2 * x_mini.T.dot(y_mini - x_mini.dot(theta)) / len(x_mini)
             theta = theta - alpha * gradient
             loss = compute_loss(y_mini, x_mini, theta, metric_type)
@@ -69,33 +72,15 @@ def mini_batch_gradient_descent(y, x, theta, max_iters, alpha, metric_type, mini
             thetas.append(theta)
             losses.append(loss)
 
-        print("BGD({bi}/{ti}): loss={l}, w={w}, b={b}".format(
-            bi=i, ti=max_iters - 1, l=loss, w=theta[0], b=theta[1]))
+            print("BGD({bi}/{ti}): loss={l}, w={w}, b={b}".format(
+                bi=i, ti=max_iters - 1, l=loss, w=theta[0], b=theta[1]))
     return thetas, losses
 
-
-def create_mini_batches(x, y, mini_batch_size):
-    mini_batches = []
+def shuffle(x,y):
     y = y.reshape((len(y), 1))
     data = np.hstack((x, y))  # recombine x & y for shuffling
     np.random.shuffle(data)
-    n_minibatches = data.shape[0] // mini_batch_size
-    i = 0
-
-    for i in range(n_minibatches + 1):  # Split the data into mini batches
-        mini_batch = data[i * mini_batch_size:(i + 1) * mini_batch_size, :]
-        x_mini = mini_batch[:, :-1]
-        y_mini = mini_batch[:, -1].reshape((-1, 1))
-        mini_batches.append((x_mini, y_mini))
-
-    if data.shape[0] % mini_batch_size != 0:  # if data isn't divisible by batch size
-        mini_batch = data[i * mini_batch_size:data.shape[0]]  # Add the remaining instances to a final mini batch
-        x_mini = mini_batch[:, :-1]
-        y_mini = mini_batch[:, -1].reshape((-1, 1))
-        mini_batches.append((x_mini, y_mini))
-
-    return mini_batches
-
+    return data[:, :-1], data[:, -1]
 
 def pso(y, x, theta, max_iters, pop_size, metric_type):
     """

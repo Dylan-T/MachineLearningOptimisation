@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import datetime
 import random
-
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
 from part3.utilities.losses import compute_loss
@@ -18,7 +18,7 @@ from sklearn.model_selection import train_test_split
 # General settings
 from part3.utilities.visualization import visualize_train, visualize_test
 
-seed = 0
+seed = 309
 # Freeze the random seed
 random.seed(seed)
 np.random.seed(seed)
@@ -127,6 +127,8 @@ if __name__ == '__main__':
     exection_time = (end_time - start_time).total_seconds()  # Track execution time
 
     # Results presentation
+    for fig in visualize_train(train_data_full, train_labels, train_data, thetas, losses, max_iters):
+        fig.canvas.draw_idle()
     print("Learn: execution time={t:.3f} seconds".format(t=exection_time))
     # Build baseline model
     print("R2:", -compute_loss(test_labels.values, test_data.values, thetas[-1], "R2"))  # R2 should be maximize
@@ -146,6 +148,8 @@ if __name__ == '__main__':
     exection_time = (end_time - start_time).total_seconds()  # Track execution time
 
     # Results presentation
+    # for fig in visualize_train(train_data_full, train_labels, train_data, thetas, losses, max_iters):
+    #     fig.canvas.draw_idle()
     print("Learn: execution time={t:.3f} seconds".format(t=exection_time))
     # Build baseline model
     print("R2:", -compute_loss(test_labels.values, test_data.values, thetas[-1], "R2"))  # R2 should be maximize
@@ -165,6 +169,7 @@ if __name__ == '__main__':
     exection_time = (end_time - start_time).total_seconds()  # Track execution time
 
     # Results presentation
+    visualize_test(test_data_full, test_data, thetas).canvas.draw_idle()
     print("Learn: execution time={t:.3f} seconds".format(t=exection_time))
     # Build baseline model
     print("R2:", -compute_loss(test_labels.values, test_data.values, thetas[-1], "R2"))  # R2 should be maximize
@@ -184,9 +189,12 @@ if __name__ == '__main__':
     exection_time = (end_time - start_time).total_seconds()  # Track execution time
 
     # Results presentation
+    visualize_test(test_data_full, test_data, thetas).canvas.draw_idle()
     print("Learn: execution time={t:.3f} seconds".format(t=exection_time))
     # Build baseline model
     print("R2:", -compute_loss(test_labels.values, test_data.values, thetas[-1], "R2"))  # R2 should be maximize
     print("MSE:", compute_loss(test_labels.values, test_data.values, thetas[-1], "MSE"))
     print("RMSE:", compute_loss(test_labels.values, test_data.values, thetas[-1], "RMSE"))
     print("MAE:", compute_loss(test_labels.values, test_data.values, thetas[-1], "MAE"))
+
+    plt.show()

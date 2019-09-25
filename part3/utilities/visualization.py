@@ -10,7 +10,6 @@ import numpy as np
 # Visualize the training course
 from part3.utilities.losses import compute_loss
 
-
 def compute_z_loss(y, x, thetas):
     """
     Compute z-axis values

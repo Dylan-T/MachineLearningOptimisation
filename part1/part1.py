@@ -11,7 +11,6 @@ import sklearn.svm as svm
 import sklearn.neural_network as nn
 import sklearn.metrics as m
 import warnings
-from prettytable import PrettyTable
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -82,15 +81,17 @@ for model in models:
 
 # Report evaluation metrics
 i = 0
-metrics = PrettyTable(["Model", "Execution Time", "MSE", "RMSE", "R-Squared", "MAE"])
+values = []
 for prediction in predictions:
     MSE = round(m.mean_squared_error(prediction, test_y), 2)
     RMSE = round(np.sqrt(MSE), 2)
     RSquared = round(m.r2_score(prediction, test_y), 2)
     MAE = round(m.mean_absolute_error(prediction, test_y), 2)
 
-    metrics.add_row([type(models[i]).__name__, executionTimes[i], MSE, RMSE, RSquared, MAE])
+    values.append((type(models[i]).__name__, executionTimes[i], MSE, RMSE, RSquared, MAE))
     i += 1
 
-print(metrics)
+metrics = pd.DataFrame(values, columns=["Model", "Execution Time", "MSE", "RMSE", "R-Squared", "MAE"])
 
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+    print(metrics)

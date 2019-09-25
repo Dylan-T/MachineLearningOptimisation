@@ -12,7 +12,6 @@ import sklearn.metrics as m
 import sklearn.naive_bayes as nb
 import sklearn.discriminant_analysis as da
 import warnings
-from prettytable import PrettyTable
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -50,26 +49,32 @@ train_y = train[14]
 test_x = test.drop([14], axis=1)
 test_y = test[14]
 
-# Standardize the inputs
-train_mean = train_x.mean()
-train_std = train_x.std()
-train_x = (train_x - train_mean) / train_std
-test_x = (test_x - train_mean) / train_std
+# Normalize the inputs
+x = train_x.values
+min_max_scaler = pp.MinMaxScaler()
+scaler = min_max_scaler.fit(x)
+x_scaled = scaler.transform(x)
+train_x = pd.DataFrame(x_scaled)
+
+x = test_x.values
+x_scaled = scaler.transform(x)
+test_x = pd.DataFrame(x_scaled)
 
 # Tricks: add dummy intercept to both train and test ???
 train_x['intercept_dummy'] = pd.Series(1.0, index=train_x.index)
 test_x['intercept_dummy'] = pd.Series(1.0, index=test_x.index)
 
+
 # Create & Train Models
 kNN = kn.KNeighborsClassifier()
 NaiveBayes = nb.MultinomialNB()
-SVM = svm.SVC(max_iter=1)
+SVM = svm.SVC()
 DecisionTree = dt.DecisionTreeClassifier()
 RandomForest = en.RandomForestClassifier()
 AdaBoost = en.AdaBoostClassifier()
 GradientBoosting = en.GradientBoostingClassifier()
 LinearDA = da.LinearDiscriminantAnalysis()
-MLP = nn.MLPClassifier(max_iter=1)
+MLP = nn.MLPClassifier()
 LogisticRegression = lm.LogisticRegression()
 
 models = [kNN, NaiveBayes, SVM, DecisionTree, RandomForest, AdaBoost, GradientBoosting, LinearDA, MLP, LogisticRegression]
@@ -79,16 +84,14 @@ predictions = []
 
 for model in models:
     # train model
-    start = time.time()
     model.fit(train_x, train_y)
 
     # Test Model
     predictions.append(model.predict(test_x))
-    executionTimes.append(round(time.time() - start, 2))
 
 # Report evaluation metrics
 i = 0
-metrics = PrettyTable(["Model", "Execution Time", "Accuracy", "Precision", "Recall", "F1-score", "AUC"])
+values = []
 for prediction in predictions:
     accuracy = round(m.accuracy_score(prediction, test_y), 2)
     precision = round(m.precision_score(prediction, test_y), 2)
@@ -98,8 +101,10 @@ for prediction in predictions:
     fpr, tpr, thresholds = m.roc_curve(test_y, prediction)
     auc = round(m.auc(fpr, tpr), 2)
 
-    metrics.add_row([type(models[i]).__name__, executionTimes[i], accuracy, precision, recall, f1Score, auc])
+    values.append((type(models[i]).__name__, accuracy, precision, recall, f1Score, auc))
     i += 1
 
-print(metrics)
+metrics = pd.DataFrame(values, columns=["Model", "Accuracy", "Precision", "Recall", "F1-score", "AUC"])
 
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+    print(metrics)
